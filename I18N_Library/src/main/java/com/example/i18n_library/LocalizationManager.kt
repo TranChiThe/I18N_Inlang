@@ -12,7 +12,8 @@ object LocalizationManager {
             "vi" -> R.raw.locales_vi
             else -> R.raw.locales_en
         }
-        val jsonString = context.resources.openRawResource(resId).bufferedReader().use(BufferedReader::readText)
+        val jsonString =
+            context.resources.openRawResource(resId).bufferedReader().use(BufferedReader::readText)
         translations = JSONObject(jsonString)
     }
 
