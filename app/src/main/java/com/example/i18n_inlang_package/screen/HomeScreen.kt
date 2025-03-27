@@ -1,46 +1,55 @@
 package com.example.i18n_inlang_package.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.i18n_library.LocalizationManager
+import com.example.i18n_inlang_package.viewModel.LanguageViewModel
 
 @Composable
-fun HomeScreen() {
-    var selectedLanguage by remember { mutableStateOf("vi") }
+fun HomeScreen(viewModel: LanguageViewModel) {
+    val currentLang by viewModel.currentLanguage.collectAsState()
     val context = LocalContext.current
-    var localizedText by remember { mutableStateOf(LocalizationManager.getString("hello")) }
-    var welcome by remember { mutableStateOf(LocalizationManager.getString("welcome")) }
+
+    val greeting = remember(currentLang) { viewModel.getString("common.greeting") }
+    val welcomeMessage = remember(currentLang) { viewModel.getString("app.welcome_message") }
+    val switchLanguage = remember(currentLang) { viewModel.getString("common.switch_language") }
+    val settingsTitle = remember(currentLang) { viewModel.getString("settings.title") }
+
+    LaunchedEffect(currentLang) {
+        Toast.makeText(context, "Language changed to: $currentLang", Toast.LENGTH_SHORT).show()
+    }
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 50.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = localizedText)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = welcome)
-        Spacer(modifier = Modifier.height(30.dp))
+        Text(
+            text = greeting,
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = welcomeMessage,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Spacer(modifier = Modifier.height(32.dp))
         Button(onClick = {
-            selectedLanguage = if (selectedLanguage == "vi") "en" else "vi"
-            LocalizationManager.loadLanguage(context, selectedLanguage)
-            localizedText = LocalizationManager.getString("hello")
-            welcome = LocalizationManager.getString("welcome")
+            val newLang = if (currentLang == "vi") "en" else "vi"
+            viewModel.setLanguage(newLang)
         }) {
-            Text(text = "Change Language")
+            Text(text = switchLanguage)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { }) {
+            Text(text = settingsTitle)
         }
     }
 }

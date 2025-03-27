@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "Ứng dụng của tôi",
+    "welcome_message": "Chào mừng đến với Ứng dụng của tôi"
+  },
+  "common": {
+    "greeting": "Xin chào",
+    "goodbye": "Tạm biệt",
+    "switch_language": "Đổi ngôn ngữ"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": "Ngôn ngữ"
+  },
+  "error": {
+    "generic": "Đã xảy ra lỗi",
+    "network": "Không có kết nối internet"
+  }
+}

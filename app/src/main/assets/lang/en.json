@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "My App",
+    "welcome_message": "Welcome to My App"
+  },
+  "common": {
+    "greeting": "Hello",
+    "goodbye": "Goodbye",
+    "switch_language": "Switch Language"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language"
+  },
+  "error": {
+    "generic": "An error occurred",
+    "network": "No internet connection"
+  }
+}
