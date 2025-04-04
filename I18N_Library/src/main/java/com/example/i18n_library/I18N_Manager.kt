@@ -2,7 +2,6 @@ package com.example.i18n_library
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,9 +10,11 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class I18nManager private constructor(context: Context) {
+class I18nManager private constructor(
+    context: Context,
+) {
     private val languageMaps = mutableMapOf<String, JSONObject>()
-    private var currentLanguage = "vi"
+    private var currentLanguage = LanguageUtil.getSavedLanguage(context)
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(Dispatchers.Main)
 
@@ -38,42 +39,43 @@ class I18nManager private constructor(context: Context) {
 
             languages.forEach { lang ->
                 try {
-                    val jsonString = withContext(Dispatchers.IO) {
-                        assetManager.open("lang/$lang.json").use { inputStream ->
-                            BufferedReader(InputStreamReader(inputStream)).readText()
+                    val jsonString =
+                        withContext(Dispatchers.IO) {
+                            assetManager.open("lang/$lang.json").use { inputStream ->
+                                BufferedReader(InputStreamReader(inputStream)).readText()
+                            }
                         }
-                    }
                     languageMaps[lang] = JSONObject(jsonString)
                 } catch (e: Exception) {
-                    Log.e("I18nManager", "Error loading language file: $lang", e)
+                    withContext(Dispatchers.Main) {
+                        Log.d("Error", "Failed to load $lang: ${e.message}")
+                    }
                 }
             }
-            if (!languageMaps.containsKey(currentLanguage)) {
-                currentLanguage = "vi"
-                LanguageUtil.setLocale(appContext, "vi")
+            withContext(Dispatchers.Main) {
+                val savedLang = LanguageUtil.getSavedLanguage(appContext)
+                if (currentLanguage != savedLang) {
+                    currentLanguage = savedLang
+                }
             }
         }
     }
 
     fun setLanguage(language: String) {
-        if (languageMaps.containsKey(language)) {
-            currentLanguage = language
-            Toast.makeText(appContext, "Switched to $language", Toast.LENGTH_SHORT).show()
-        }
+        currentLanguage = language
     }
 
-
     fun getString(key: String): String {
+        val jsonObject = languageMaps[currentLanguage]
         return try {
-            val jsonObject = languageMaps[currentLanguage] ?: return key
+            if (jsonObject == null) return key
             val keys = key.split(".")
             var currentObject: JSONObject? = jsonObject
             for (i in 0 until keys.size - 1) {
                 currentObject = currentObject?.optJSONObject(keys[i])
                 if (currentObject == null) return key
             }
-            val result = currentObject?.getString(keys.last()) ?: key
-            result
+            currentObject?.getString(keys.last()) ?: key
         } catch (e: Exception) {
             key
         }
