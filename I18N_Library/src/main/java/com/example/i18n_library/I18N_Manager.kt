@@ -36,7 +36,6 @@ class I18nManager private constructor(
         scope.launch {
             val languages = arrayOf("en", "vi")
             val assetManager = appContext.assets
-
             languages.forEach { lang ->
                 try {
                     val jsonString =

@@ -14,21 +14,20 @@ object LanguageUtil {
     fun setLocale(
         context: Context,
         language: String,
-    ) {
+    ): Context {
         val locale = Locale(language)
         Locale.setDefault(locale)
-
         val config =
-            Configuration().apply {
+            Configuration(context.resources.configuration).apply {
                 setLocale(locale)
             }
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
 
         context
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_LANGUAGE, language)
             .apply()
+        return context.createConfigurationContext(config)
     }
 
     fun getSavedLanguage(context: Context): String {
