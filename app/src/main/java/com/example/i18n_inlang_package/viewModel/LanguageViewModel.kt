@@ -3,6 +3,7 @@ package com.example.i18n_inlang_package.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.i18n_inlang_package.R
 import com.example.i18n_library.I18nManager
 import com.example.i18n_library.LanguageUtil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,4 +47,24 @@ class LanguageViewModel(
     fun getString(key: String): String = i18nManager.getString(key)
 
     fun isLanguageLoaded(): Boolean = i18nManager.isLanguageLoaded(currentLanguage.value)
+
+    fun getAvailableLanguages(): List<Triple<String, String, Int>> =
+        listOf(
+            Triple("en", "English", R.drawable.usa_flag),
+            Triple("vi", "Tiếng Việt", R.drawable.vietnam_flag),
+        )
+
+    fun getFlagResource(langCode: String): Int =
+        when (langCode) {
+            "en" -> R.drawable.usa_flag
+            "vi" -> R.drawable.vietnam_flag
+            else -> R.drawable.ic_launcher_foreground
+        }
+
+    fun getLanguageName(currentLang: String): String =
+        when (currentLang) {
+            "en" -> "USA"
+            "vi" -> "Việt Nam"
+            else -> "Not found"
+        }
 }
