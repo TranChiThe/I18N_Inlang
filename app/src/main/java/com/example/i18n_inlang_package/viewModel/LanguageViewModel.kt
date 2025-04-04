@@ -31,11 +31,15 @@ class LanguageViewModel(
         }
     }
 
-    fun setLanguage(language: String) {
+    fun setLanguage(
+        language: String,
+        recreateActivity: (() -> Unit)? = null,
+    ) {
         viewModelScope.launch {
             LanguageUtil.setLocale(getApplication(), language)
             i18nManager.setLanguage(language)
             _currentLanguage.value = language
+            recreateActivity?.invoke()
         }
     }
 

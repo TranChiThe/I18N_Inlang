@@ -15,5 +15,11 @@
   "error": {
     "generic": "Đã xảy ra lỗi",
     "network": "Không có kết nối internet"
+  },
+  "home": {
+    "home": "Trang chủ"
+  },
+  "setting":{
+    "setting": "Cài đặt"
   }
 }

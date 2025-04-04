@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -25,18 +26,24 @@ import com.example.i18n_inlang_package.viewModel.LanguageViewModel
 fun Navigation(viewModel: LanguageViewModel) {
     val navController = rememberNavController()
     val isLanguageLoaded = viewModel.isLanguageLoaded.collectAsState().value
+    val currentLang by viewModel.currentLanguage.collectAsState()
     if (isLanguageLoaded) {
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopAppBar(
                     title = { Text("") },
                     actions = {
+                        val homeText = viewModel.getString("home.home")
+                        val settingsText = viewModel.getString("setting.setting")
                         Button(onClick = { navController.navigate("Home") }) {
-                            Text("Home")
+                            Text(homeText)
                         }
                         Button(onClick = { navController.navigate("Setting") }) {
-                            Text("Setting")
+                            Text(settingsText)
                         }
+                        @Suppress("UNUSED_EXPRESSION")
+                        currentLang
                     },
                 )
             },

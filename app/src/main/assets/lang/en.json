@@ -15,5 +15,11 @@
   "error": {
     "generic": "An error occurred",
     "network": "No internet connection"
+  },
+  "home": {
+    "home": "Home"
+  },
+  "setting":{
+    "setting": "Settings"
   }
 }

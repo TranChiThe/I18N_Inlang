@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         LanguageUtil.applyLanguage(this)
         setContent {
             I18N_InLang_PackageTheme {
-                Navigation(languageViewModel)
+                Navigation(viewModel = languageViewModel)
             }
         }
     }
