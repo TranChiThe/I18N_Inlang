@@ -18,8 +18,19 @@ class I18nManager private constructor(
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(Dispatchers.Main)
 
+    // (lấy từ inlang.config.json)
+    private val namespaces =
+        mapOf(
+            "common" to "translations/{lang}/ui_and_ux/common.json",
+            "mediaMessages" to "translations/{lang}/chat/attachments/mediaMessages.json",
+            "editor" to "translations/{lang}/chat/editor/editor.json",
+            "updateManager" to "translations/{lang}/app/updateManager.json",
+            "mutualChannels" to "translations/{lang}/social/friend_suggests/mutualChannels.json",
+            "mutualFriends" to "translations/{lang}/social/friend_suggests/mutualFriends.json",
+        )
+
     init {
-        loadLanguagesAsync()
+        loadLanguageAsync(currentLanguage)
     }
 
     companion object {
@@ -32,39 +43,52 @@ class I18nManager private constructor(
             }
     }
 
-    private fun loadLanguagesAsync() {
+    private fun loadLanguageAsync(lang: String) {
+        if (languageMaps.containsKey(lang)) return
+
         scope.launch {
-            val languages = arrayOf("en", "vi")
-            val assetManager = appContext.assets
-            languages.forEach { lang ->
-                try {
-                    val jsonString =
-                        withContext(Dispatchers.IO) {
-                            assetManager.open("lang/$lang.json").use { inputStream ->
-                                BufferedReader(InputStreamReader(inputStream)).readText()
+            try {
+                val langObject = JSONObject()
+                val assetManager = appContext.assets
+                namespaces.forEach { (namespace, pathTemplate) ->
+                    val filePath = pathTemplate.replace("{lang}", lang)
+                    try {
+                        val jsonString =
+                            withContext(Dispatchers.IO) {
+                                assetManager.open(filePath).use { inputStream ->
+                                    BufferedReader(InputStreamReader(inputStream)).readText()
+                                }
                             }
-                        }
-                    languageMaps[lang] = JSONObject(jsonString)
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Log.d("Error", "Failed to load $lang: ${e.message}")
+                        langObject.put(namespace, JSONObject(jsonString))
+                    } catch (e: Exception) {
+                        Log.e("I18nManager", "Failed to load $filePath: ${e.message}")
                     }
                 }
-            }
-            withContext(Dispatchers.Main) {
-                val savedLang = LanguageUtil.getSavedLanguage(appContext)
-                if (currentLanguage != savedLang) {
-                    currentLanguage = savedLang
+                languageMaps[lang] = langObject
+                withContext(Dispatchers.Main) {
+                    if (lang == currentLanguage) {
+                        Log.d("I18nManager", "Loaded language: $lang")
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("I18nManager", "Failed to load language $lang: ${e.message}")
             }
         }
     }
 
     fun setLanguage(language: String) {
-        currentLanguage = language
+        if (currentLanguage != language) {
+            currentLanguage = language
+            loadLanguageAsync(language)
+        }
     }
 
-    fun getString(key: String): String {
+    fun getString(key: String): String = getString(key, emptyMap())
+
+    fun getString(
+        key: String,
+        params: Map<String, String>,
+    ): String {
         val jsonObject = languageMaps[currentLanguage]
         return try {
             if (jsonObject == null) return key
@@ -74,8 +98,13 @@ class I18nManager private constructor(
                 currentObject = currentObject?.optJSONObject(keys[i])
                 if (currentObject == null) return key
             }
-            currentObject?.getString(keys.last()) ?: key
+            var result = currentObject?.getString(keys.last()) ?: key
+            params.forEach { (param, value) ->
+                result = result.replace("<$param>", value)
+            }
+            result
         } catch (e: Exception) {
+            Log.e("I18nManager", "Error retrieving key $key: ${e.message}")
             key
         }
     }

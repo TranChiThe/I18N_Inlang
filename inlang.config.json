@@ -1,0 +1,30 @@
+{
+  "$schema": "https://inlang.com/schema/project-settings",
+  "baseLocale": "en",
+  "locales": ["en", "af", "ar", "vi"],
+  "sourceLanguageTag": "en",
+  "languageTags": [
+    "en",
+    "af",
+    "ar",
+    "vi"
+  ],
+  "modules": [
+    "https://cdn.jsdelivr.net/npm/@inlang/plugin-i18next@latest/dist/index.js",
+    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-empty-pattern@latest/dist/index.js",
+    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-identical-pattern@latest/dist/index.js",
+    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-without-source@latest/dist/index.js",
+    "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-missing-translation@latest/dist/index.js"
+  ],
+  "plugin.inlang.i18next": {
+    "pathPattern": {
+      "common": "translations/{languageTag}/ui_and_ux/common.json",
+      "mediaMessages": "translations/{languageTag}/chat/attachments/mediaMessages.json",
+      "editor": "translations/{languageTag}/chat/editor/editor.json",
+      "updateManager": "translations/{languageTag}/app/updateManager.json",
+      "mutualChannels": "translations/{languageTag}/social/friend_suggests/mutualChannels.json",
+      "mutualFriends": "translations/{languageTag}/social/friend_suggests/mutualFriends.json"
+    },
+    "variableReferencePattern": ["@:"]
+  }
+}

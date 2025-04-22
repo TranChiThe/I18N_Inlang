@@ -19,7 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.i18n_inlang_package.screen.HomeScreen
 import com.example.i18n_inlang_package.screen.SettingsScreen
-import com.example.i18n_inlang_package.viewModel.LanguageViewModel
+import com.example.sample_app.viewModel.LanguageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +34,8 @@ fun Navigation(viewModel: LanguageViewModel) {
                 TopAppBar(
                     title = { Text("") },
                     actions = {
-                        val homeText = viewModel.getString("home.home")
-                        val settingsText = viewModel.getString("setting.setting")
+                        val homeText = viewModel.getString("common.home")
+                        val settingsText = viewModel.getString("common.setting")
                         Button(onClick = { navController.navigate("Home") }) {
                             Text(homeText)
                         }

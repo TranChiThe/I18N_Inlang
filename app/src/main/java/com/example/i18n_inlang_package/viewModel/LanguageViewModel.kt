@@ -1,4 +1,4 @@
-package com.example.i18n_inlang_package.viewModel
+package com.example.sample_app.viewModel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -20,15 +20,12 @@ class LanguageViewModel(
     private val _isLanguageLoaded = MutableStateFlow(false)
     val isLanguageLoaded: StateFlow<Boolean> = _isLanguageLoaded
 
+    private val _version = MutableStateFlow("123")
+    val version: StateFlow<String> = _version
+
     init {
         viewModelScope.launch {
-            while (i18nManager.isLanguageLoaded("en") != true || i18nManager.isLanguageLoaded("vi") != true) {
-                kotlinx.coroutines.delay(100)
-            }
-            _isLanguageLoaded.value = true
-            val savedLang = LanguageUtil.getSavedLanguage(application)
-            _currentLanguage.value = savedLang
-            i18nManager.setLanguage(savedLang)
+            updateLanguageLoadedState(_currentLanguage.value)
         }
     }
 
@@ -37,33 +34,48 @@ class LanguageViewModel(
         recreateActivity: (() -> Unit)? = null,
     ) {
         viewModelScope.launch {
+            _isLanguageLoaded.value = false
             LanguageUtil.setLocale(getApplication(), language)
             i18nManager.setLanguage(language)
             _currentLanguage.value = language
+            updateLanguageLoadedState(language)
             recreateActivity?.invoke()
         }
     }
 
-    fun getString(key: String): String = i18nManager.getString(key)
+    private suspend fun updateLanguageLoadedState(language: String) {
+        while (!i18nManager.isLanguageLoaded(language)) {
+            kotlinx.coroutines.delay(100)
+        }
+        _isLanguageLoaded.value = true
+    }
+
+    fun getString(
+        key: String,
+        params: Map<String, String> = emptyMap(),
+    ): String = i18nManager.getString(key, params)
 
     fun isLanguageLoaded(): Boolean = i18nManager.isLanguageLoaded(currentLanguage.value)
 
     fun getAvailableLanguages(): List<Triple<String, String, Int>> =
         listOf(
             Triple("en", "English", R.drawable.usa_flag),
-            Triple("vi", "Tiếng Việt", R.drawable.vietnam_flag),
+            Triple("id", "Indonesia", R.drawable.indonesia),
+            Triple("vi", "Việt Nam", R.drawable.vietnam_flag),
         )
 
     fun getFlagResource(langCode: String): Int =
         when (langCode) {
             "en" -> R.drawable.usa_flag
+            "id" -> R.drawable.indonesia
             "vi" -> R.drawable.vietnam_flag
             else -> R.drawable.ic_launcher_foreground
         }
 
     fun getLanguageName(currentLang: String): String =
         when (currentLang) {
-            "en" -> "USA"
+            "en" -> "English"
+            "id" -> "Indonesia"
             "vi" -> "Việt Nam"
             else -> "Not found"
         }

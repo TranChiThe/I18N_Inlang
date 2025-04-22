@@ -1,15 +1,14 @@
-@file:Suppress("ktlint:standard:filename")
-
 package com.example.i18n_library
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import java.util.Locale
 
 object LanguageUtil {
     private const val PREFS_NAME = "LanguagePrefs"
     private const val KEY_LANGUAGE = "language"
-    private val SUPPORTED_LANGUAGES = setOf("en", "vi")
+    private val SUPPORTED_LANGUAGES = setOf("en", "id", "vi")
 
     fun setLocale(
         context: Context,
@@ -50,5 +49,14 @@ object LanguageUtil {
         setLocale(context, getSavedLanguage(context))
     }
 
-    fun getSystemLanguage(): String = Locale.getDefault().language
+    fun getSystemLanguage(): String {
+        val locale = Locale.getDefault()
+        val language = locale.language
+        Log.d("LanguageUtil", "System locale: $locale, language: $language")
+        return when {
+            language.startsWith("in") -> "id"
+            SUPPORTED_LANGUAGES.contains(language) -> language
+            else -> "en"
+        }
+    }
 }

@@ -28,12 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.i18n_inlang_package.viewModel.LanguageViewModel
+import com.example.sample_app.viewModel.LanguageViewModel
 
 @Composable
 fun SettingsScreen(viewModel: LanguageViewModel) {
     val currentLang by viewModel.currentLanguage.collectAsState()
-    val switchLanguage = remember(currentLang) { viewModel.getString("common.switch_language") }
     val languageList = viewModel.getAvailableLanguages()
     var expanded by remember { mutableStateOf(false) }
 
@@ -46,13 +45,8 @@ fun SettingsScreen(viewModel: LanguageViewModel) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = viewModel.getString("settings.title"),
+            text = viewModel.getString("common.setting"),
             style = MaterialTheme.typography.headlineMedium,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = viewModel.getString("settings.language"),
-            style = MaterialTheme.typography.bodyLarge,
         )
         Spacer(modifier = Modifier.height(32.dp))
         Box {
